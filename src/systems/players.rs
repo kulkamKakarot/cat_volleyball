@@ -1,5 +1,5 @@
 use amethyst::{
-    core::Transform,
+    core::{Transform, Time},
     core::SystemDesc,
     derive::SystemDesc,
     ecs::{Join, Read,ReadStorage,System, SystemData,World,
@@ -9,17 +9,20 @@ use amethyst::{
 
 use crate::catvolleyball::{Player,Side,ARENA_WIDTH,PLAYER_WIDTH};
 
+const PLAYER_SPEED: f32 = 60.0;
 #[derive(SystemDesc)]
 pub struct PlayerSystem;
+
 impl<'s>System<'s> for PlayerSystem{
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Player>,
+        Read<'s, Time>,
         Read<'s, InputHandler<StringBindings>>,
     );
     fn run(
         &mut self,
-        (mut transforms,players,input):Self::SystemData
+        (mut transforms,players,time,input):Self::SystemData
     ){
         for(player, transform) in
             (&players, &mut transforms).join(){
@@ -28,12 +31,26 @@ impl<'s>System<'s> for PlayerSystem{
                     Side::Right => input.axis_value("right_player"),
                 };
                 if let Some(mv_amount) = movement{
-                    if mv_amount != 0.0{
-                        let side_name = match  {
-                            
-                        };
-                    }
+                    let scaled_amount = (
+                        PLAYER_SPEED*
+                        time.delta_seconds()*
+                        mv_amount
+                    )as f32;
+                    let player_x = transform.translation().x;
+                    let player_left_limit = match player.side{
+                        Side::Left => 0.0,
+                        Side::Right=>ARENA_WIDTH*0.5,
+                    };
+                    transform.set_translation_x(
+                        (player_x+scaled_amount)
+                        .max(player_left_limit+PLAYER_WIDTH*0.5)
+                        .min(
+                            player_left_limit+
+                            (ARENA_WIDTH*0.5)-
+                            (PLAYER_WIDTH*0.5)
+                        ),
+                    );
                 }
             }
+        }
     }
-}

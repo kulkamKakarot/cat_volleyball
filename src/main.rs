@@ -13,6 +13,8 @@ use amethyst::{
 mod catvolleyball;
 use crate::catvolleyball::CatVolleyball;
 
+mod systems;
+
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
@@ -37,7 +39,9 @@ fn main() -> amethyst::Result<()> {
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(TransformBundle::new())?
-        .with_bundle(input_bundle)?;
+        .with_bundle(input_bundle)?
+        .with(systems::PlayerSystem, "player_system", &["input_system"]);
+        
 
     let mut game = Application::new(assets_dir, CatVolleyball, game_data)?;
     game.run();

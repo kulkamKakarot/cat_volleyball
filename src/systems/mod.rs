@@ -1,3 +1,3 @@
-mod player;
+mod players;
 
-pub use self::player::PlayerSystem;
+pub use self::players::PlayerSystem;
