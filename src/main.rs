@@ -1,4 +1,5 @@
 use amethyst::{
+    ui::{RenderUi,UiBundle},
     input::{InputBundle,StringBindings},
     core::transform::TransformBundle,
     prelude::*,
@@ -36,14 +37,17 @@ fn main() -> amethyst::Result<()> {
                     RenderToWindow::from_config_path(display_config_path)?
                         .with_clear([0.0, 0.0, 0.0, 1.0]),
                 )
+                .with_plugin(RenderUi::default())
                 .with_plugin(RenderFlat2D::default()),
         )?
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
+        .with_bundle(UiBundle::<StringBindings>::new())?
         .with(systems::PlayerSystem, "player_system", &["input_system"])
         .with(systems::MoveBallsSystem, "ball_system", &[])
         .with(systems::BounceSystem,"collision_system",
-            &["player_system","ball_system"]);
+            &["player_system","ball_system"])
+        .with(systems::WinnerSystem,"winner_system",&["ball_system"]);
 
 
     let mut game = Application::new(assets_dir, CatVolleyball, game_data)?;
