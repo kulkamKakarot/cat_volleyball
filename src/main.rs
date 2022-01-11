@@ -41,7 +41,9 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(systems::PlayerSystem, "player_system", &["input_system"])
-        .with(systems::MoveBallsSystem, "ball_system", &[]);
+        .with(systems::MoveBallsSystem, "ball_system", &[])
+        .with(systems::BounceSystem,"collision_system",
+            &["player_system","ball_system"]);
 
 
     let mut game = Application::new(assets_dir, CatVolleyball, game_data)?;
